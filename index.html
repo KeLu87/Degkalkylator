@@ -1,173 +1,441 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🥖 Degkalkylator</title>
+  <style>
+    /* =============================
+       Reset & Base
+    ============================ */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: #0f0f12;
+      color: #f2f2f7;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* =============================
+       Layout
+    ============================ */
+    .container {
+      background: #1c1c1e;
+      padding: 20px;
+      border-radius: 14px;
+      max-width: 420px;
+      margin: auto;
+    }
+
+    /* =============================
+       Typography & Text
+    ============================ */
+    label { display: block; margin-top: 12px; font-weight: 600; color: #d1d1d6; transition: color 0.3s; }
+    p, strong { color: #f2f2f7; transition: color 0.3s; }
+    hr { border: none; border-top: 1px solid #3a3a3c; margin: 20px 0; }
+
+    /* =============================
+       Inputs
+    ============================ */
+    input { width: 60%; padding: 8px; font-size: 18px; margin-top: 6px; border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: #ffffff; transition: all 0.3s; }
+
+    /* =============================
+       Toggle rows (shared)
+    ============================ */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .toggle-row input { display: none; }
+    .switch { width: 46px; height: 26px; background: #3a3a3c; border-radius: 13px; position: relative; cursor: pointer; }
+    .switch::after { content: ""; width: 22px; height: 22px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.25s ease; }
+    .toggle-row input:checked + .switch { background: #34c759; }
+    .toggle-row input:checked + .switch::after { transform: translateX(20px); }
+
+    /* =============================
+       Fördeg (collapse)
+    ============================ */
+    #prefSection { overflow: hidden; max-height: 2000px; opacity: 1; transition: max-height 0.35s ease, opacity 0.25s ease; }
+    #prefSection.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+
+    /* =============================
+       Settings
+    ============================ */
+    #settingsBtn { background: none; border: none; font-size: 22px; cursor: pointer; float: right; margin-top: -26px; margin-right: -12px; }
+    .settings-panel { margin-top: 14px; padding: 16px; border-radius: 14px; background: #2c2c2e; display: none; animation: settingsFade 0.25s ease-out; }
+    .settings-panel.open { display: block; }
+    .settings-panel h3 { margin: 0 0 12px; font-size: 18px; }
+    .settings-panel h4 { margin: 14px 0 6px; font-size: 13px; color: #b0b0b5; text-transform: uppercase; letter-spacing: 0.04em; }
+    @keyframes settingsFade { from { opacity:0; transform:translateY(-6px);} to {opacity:1; transform:translateY(0);} }
+
+    /* =============================
+       Recipe
+    ============================ */
+    .recipe-section { margin-top: 10px; }
+    .recipe-section.collapsed { display: none; }
+    #settingsPanel button, #settingsPanel select { width: 65%; padding: 8px; font-size: 16px; border-radius: 10px; margin-top: 8px; background: #2c2c2e; border: 1px solid #3a3a3c; color: #f2f2f7; -webkit-appearance: none; cursor: pointer; transition: all 0.2s; }
+    #settingsPanel button:hover, #settingsPanel select:hover { background: #3a3a3c; }
+    #recipeSelectWrapper { display: block; margin-top: 12px; font-weight: 600; color: #d1d1d6; }
+    #recipeSelect { width: 65%; padding: 8px; font-size: 16px; margin-top: 6px; border-radius: 10px; background: #2c2c2e; color:#fff; border:1px solid #3a3a3c; -webkit-appearance:none; appearance:none; transition: all 0.3s; }
+
+    /* =============================
+       Light mode
+    ============================ */
+    body.light { background: #f2f2f7; color: #000; }
+    body.light .container { background: #fff; }
+    body.light label, body.light p, body.light strong { color: #000; }
+    body.light input { background:#fff; color:#000; border:1px solid #ccc; }
+    body.light hr { border-top:1px solid #ccc; }
+    body.light .settings-panel { background:#f2f2f7; }
+    body.light .settings-panel h4 { color:#666; }
+    body.light #settingsPanel button, body.light #settingsPanel select { background:#f2f2f7; border:1px solid #ccc; color:#000; }
+    body.light #settingsPanel button:hover, body.light #settingsPanel select:hover { background:#e0e0e0; }
+    body.light #recipeSelect { background:#fff; color:#000; border:1px solid #ccc; }
+    body.light #recipeSelectWrapper { color:#000; }
+  </style>
+</head>
 <body>
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <button id="settingsBtn" aria-label="Inställningar">⚙️</button>
+      <h1>🥖 Degkalkylator</h1>
+    </header>
 
-<div class="container">
-  <!-- =========================
-       App Header
-  ========================= -->
-  <header class="app-header">
-    <button id="settingsBtn" aria-label="Inställningar">⚙️</button>
-    <h1>🥖 Degkalkylator</h1>
-  </header>
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+      <h3>Inställningar</h3>
 
-
-  <!-- =========================
-       Settings panel
-  ========================= -->
-  <div id="settingsPanel" class="settings-panel">
-
-    <h3>Inställningar</h3>
-
-    <!-- Utseende -->
-    <h4>Utseende</h4>
-    <label class="toggle-row">
-      <div class="toggle-left">
-        <span id="themeIcon">🌙</span>
-        <span>Mörkt / ljust läge</span>
-      </div>
-      <input type="checkbox" id="themeToggle">
-      <span class="switch"></span>
-    </label>
-
-    <hr>
-
-    <!-- Beräkning -->
-    <h4>Beräkning</h4>
-    <label class="toggle-row">
-      <span>🥣 Använd fördeg</span>
-      <input type="checkbox" id="usePref">
-      <span class="switch"></span>
-    </label>
-
-    <hr>
-
-    <!-- Data -->
-    <h4>Data</h4>
-    <label class="toggle-row">
-      <span>📖 Recept</span>
-      <input type="checkbox" id="recipeToggle">
-      <span class="switch"></span>
-    </label>
-
-    <!-- Receptsektion -->
-    <div id="recipeSection" class="recipe-section collapsed">
-
-      <input
-        type="text"
-        id="recipeNameInput"
-        placeholder="Namn på recept..."
-      >
-
-      <button id="saveRecipeBtn" class="settings-btn">
-        💾 Spara recept
-      </button>
-      
-      <button id="deleteRecipeBtn" class="settings-btn">
-  🗑 Radera recept
-</button>
-
-      <label id="recipeSelectWrapper">
-        📂 Välj recept
-        <select id="recipeSelect">
-          <option value="">– Välj sparat recept –</option>
-        </select>
+      <h4>Utseende</h4>
+      <label class="toggle-row">
+        <div class="toggle-left"><span id="themeIcon">🌙</span> <span>Mörkt / ljust läge</span></div>
+        <input type="checkbox" id="themeToggle"><span class="switch"></span>
       </label>
 
       <hr>
 
-      <button id="exportRecipesBtn" class="settings-btn">
-        📤 Exportera recept
-      </button>
+      <h4>Beräkning</h4>
+      <label class="toggle-row">
+        <span>🥣 Använd fördeg</span>
+        <input type="checkbox" id="usePref"><span class="switch"></span>
+      </label>
 
-      <input
-        type="file"
-        id="importRecipesInput"
-        accept=".json"
-        style="display:none;"
-      >
+      <hr>
 
-      <button id="importRecipesBtn" class="settings-btn">
-        📥 Importera recept
-      </button>
+      <h4>Data</h4>
+      <label class="toggle-row">
+        <span>📖 Recept</span>
+        <input type="checkbox" id="recipeToggle"><span class="switch"></span>
+      </label>
 
+      <!-- Recept -->
+      <div id="recipeSection" class="recipe-section collapsed">
+        <input type="text" id="recipeNameInput" placeholder="Namn på recept...">
+        <button id="saveRecipeBtn" class="settings-btn">💾 Spara recept</button>
+        <button id="deleteRecipeBtn" class="settings-btn">🗑 Radera recept</button>
+        <label id="recipeSelectWrapper">📂 Välj recept
+          <select id="recipeSelect"><option value="">– Välj sparat recept –</option></select>
+        </label>
+        <hr>
+        <button id="exportRecipesBtn" class="settings-btn">📤 Exportera recept</button>
+        <input type="file" id="importRecipesInput" accept=".json" style="display:none;">
+        <button id="importRecipesBtn" class="settings-btn">📥 Importera recept</button>
+      </div>
     </div>
 
+    <!-- Dynamiskt verktygsfält -->
+    <div id="recipeInsertPoint"></div>
+
+    <!-- Inputs -->
+    <section class="base-inputs">
+      <label>⚖️ Total degvikt (g)</label>
+      <input type="number" id="totalDoughInput" value="1000">
+    </section>
+
+    <section id="prefSection" class="collapsed">
+      <hr>
+      <h2>Fördeg</h2>
+      <label>Andel av total deg (%)</label>
+      <input type="number" id="prefPct" value="0">
+      <label>Hydration fördeg (%)</label>
+      <input type="number" id="prefHyd" value="60">
+      <label>Jäst fördeg (%)</label>
+      <input type="number" id="prefYeastPct" value="0.1" step="0.01">
+      <p>🌾 Mjöl: <strong><span id="prefFlour">0</span> g</strong></p>
+      <p>💧 Vatten: <strong><span id="prefWater">0</span> g</strong></p>
+      <p>🍞 Jäst: <strong><span id="prefYeast">0</span> g</strong></p>
+      <p>⚖️ Fördeg totalt: <strong><span id="prefTotal">0</span> g</strong></p>
+    </section>
+
+    <section class="main-dough">
+      <hr>
+      <h2>Huvuddeg</h2>
+      <label>Hydration (%)</label>
+      <input type="number" id="waterPct" value="65">
+      <label>Salt (%)</label>
+      <input type="number" id="saltPct" value="2.5">
+      <label>Jäst (%)</label>
+      <input type="number" id="yeastPct" value="1.0">
+      <p>🌾 Mjöl: <strong><span id="mainFlour">0</span> g</strong></p>
+      <p>💧 Vatten: <strong><span id="mainWater">0</span> g</strong></p>
+      <p>🧂 Salt: <strong><span id="salt">0</span> g</strong></p>
+      <p>🍞 Jäst: <strong><span id="yeast">0</span> g</strong></p>
+      <p>⚖️ Huvuddeg totalt: <strong><span id="mainTotal">0</span> g</strong></p>
+    </section>
+
+    <section class="totals">
+      <hr>
+      <h2>Totalt</h2>
+      <p>🌾 Totalt mjöl: <strong><span id="totalFlour">0</span> g</strong></p>
+      <p>💧 Totalt vatten: <strong><span id="totalWater">0</span> g</strong></p>
+      <p>⚖️ Total deg: <strong><span id="totalCheck">0</span> g</strong></p>
+    </section>
   </div>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // --- Elements ---
+      const totalDoughInput = document.getElementById("totalDoughInput");
+      const prefPct = document.getElementById("prefPct");
+      const prefHyd = document.getElementById("prefHyd");
+      const prefYeastPct = document.getElementById("prefYeastPct");
+      const waterPct = document.getElementById("waterPct");
+      const saltPct = document.getElementById("saltPct");
+      const yeastPct = document.getElementById("yeastPct");
+      const inputs = [totalDoughInput,prefPct,prefHyd,prefYeastPct,waterPct,saltPct,yeastPct];
 
-  <!-- =========================
-       Dynamiskt verktygsfält
-       (recept flyttas hit)
-  ========================= -->
-  <div id="recipeInsertPoint"></div>
+      const prefFlourEl = document.getElementById("prefFlour");
+      const prefWaterEl = document.getElementById("prefWater");
+      const prefYeastEl = document.getElementById("prefYeast");
+      const prefTotalEl = document.getElementById("prefTotal");
 
+      const mainFlourEl = document.getElementById("mainFlour");
+      const mainWaterEl = document.getElementById("mainWater");
+      const saltEl = document.getElementById("salt");
+      const yeastEl = document.getElementById("yeast");
+      const mainTotalEl = document.getElementById("mainTotal");
 
-  <!-- =========================
-       Grundinput
-  ========================= -->
-  <section class="base-inputs">
-    <label>⚖️ Total degvikt (g)</label>
-    <input type="number" id="totalDoughInput" value="1000">
-  </section>
+      const totalFlourEl = document.getElementById("totalFlour");
+      const totalWaterEl = document.getElementById("totalWater");
+      const totalCheckEl = document.getElementById("totalCheck");
 
+      const settingsBtn = document.getElementById("settingsBtn");
+      const settingsPanel = document.getElementById("settingsPanel");
 
-  <!-- =========================
-       Fördeg
-  ========================= -->
-  <section id="prefSection" class="collapsed">
-    <hr>
-    <h2>Fördeg</h2>
+      const themeToggle = document.getElementById("themeToggle");
+      const themeIcon = document.getElementById("themeIcon");
 
-    <label>Andel av total deg (%)</label>
-    <input type="number" id="prefPct" value="0">
+      const usePref = document.getElementById("usePref");
+      const prefSection = document.getElementById("prefSection");
 
-    <label>Hydration fördeg (%)</label>
-    <input type="number" id="prefHyd" value="60">
+      const recipeToggle = document.getElementById("recipeToggle");
+      const recipeSection = document.getElementById("recipeSection");
+      const recipeSelectWrapper = document.getElementById("recipeSelectWrapper");
+      const recipeInsertPoint = document.getElementById("recipeInsertPoint");
 
-    <label>Jäst fördeg (%)</label>
-    <input type="number" id="prefYeastPct" value="0.1" step="0.01">
+      const recipeNameInput = document.getElementById("recipeNameInput");
+      const saveRecipeBtn = document.getElementById("saveRecipeBtn");
+      const deleteRecipeBtn = document.getElementById("deleteRecipeBtn");
+      const recipeSelect = document.getElementById("recipeSelect");
+      const exportBtn = document.getElementById("exportRecipesBtn");
+      const importBtn = document.getElementById("importRecipesBtn");
+      const importInput = document.getElementById("importRecipesInput");
 
-    <p>🌾 Mjöl: <strong><span id="prefFlour">0</span> g</strong></p>
-    <p>💧 Vatten: <strong><span id="prefWater">0</span> g</strong></p>
-    <p>🍞 Jäst: <strong><span id="prefYeast">0</span> g</strong></p>
-    <p>⚖️ Fördeg totalt: <strong><span id="prefTotal">0</span> g</strong></p>
-  </section>
+      // --- Settings toggle ---
+      settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("open"));
 
+      // --- Theme ---
+      (() => {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        applyTheme(savedTheme);
+        themeToggle.checked = savedTheme === "light";
 
-  <!-- =========================
-       Huvuddeg
-  ========================= -->
-  <section class="main-dough">
-    <hr>
-    <h2>Huvuddeg</h2>
+        themeToggle.addEventListener("change", () => {
+          const theme = themeToggle.checked ? "light":"dark";
+          applyTheme(theme);
+          localStorage.setItem("theme", theme);
+        });
 
-    <label>Hydration (%)</label>
-    <input type="number" id="waterPct" value="65">
+        function applyTheme(theme){
+          document.body.classList.remove("dark","light");
+          document.body.classList.add(theme);
+          themeIcon.textContent = theme==="light"?"☀️":"🌙";
+        }
+      })();
 
-    <label>Salt (%)</label>
-    <input type="number" id="saltPct" value="2.5">
+      // --- Pref toggle ---
+      (() => {
+        const savedPref = localStorage.getItem("usePref")==="1";
+        usePref.checked = savedPref;
+        prefSection.classList.toggle("collapsed",!savedPref);
+        if(!savedPref) prefPct.value=0;
 
-    <label>Jäst (%)</label>
-    <input type="number" id="yeastPct" value="1.0">
+        usePref.addEventListener("change",()=> {
+          const on = usePref.checked;
+          prefSection.classList.toggle("collapsed",!on);
+          if(!on) prefPct.value=0;
+          localStorage.setItem("usePref",on?"1":"0");
+          recalc();
+        });
+      })();
 
-    <p>🌾 Mjöl: <strong><span id="mainFlour">0</span> g</strong></p>
-    <p>💧 Vatten: <strong><span id="mainWater">0</span> g</strong></p>
-    <p>🧂 Salt: <strong><span id="salt">0</span> g</strong></p>
-    <p>🍞 Jäst: <strong><span id="yeast">0</span> g</strong></p>
-    <p>⚖️ Huvuddeg totalt: <strong><span id="mainTotal">0</span> g</strong></p>
-  </section>
+      // --- Recipe toggle ---
+      const recipeOriginalParent = recipeSelectWrapper.parentNode;
+      const recipeOriginalNext = recipeSelectWrapper.nextSibling;
+      moveRecipeSelector(recipeToggle.checked);
+      recipeToggle.checked=false;
+      recipeSection.classList.add("collapsed");
+      recipeToggle.addEventListener("change",()=> {
+        const en = recipeToggle.checked;
+        recipeSection.classList.toggle("collapsed",!en);
+        moveRecipeSelector(en);
+      });
+      function moveRecipeSelector(enabled){
+        if(enabled) recipeInsertPoint.appendChild(recipeSelectWrapper);
+        else recipeOriginalParent.insertBefore(recipeSelectWrapper,recipeOriginalNext);
+      }
 
+      // --- Recipes ---
+      let recipes = JSON.parse(localStorage.getItem("recipes")||"[]");
+      if(!Array.isArray(recipes)) recipes=[];
+      refreshDropdown();
 
-  <!-- =========================
-       Totalt
-  ========================= -->
-  <section class="totals">
-    <hr>
-    <h2>Totalt</h2>
+      saveRecipeBtn.addEventListener("click",()=> {
+        const name = recipeNameInput.value.trim();
+        if(!name)return alert("Skriv ett namn på receptet!");
+        const newRecipe = {
+          D:Number(totalDoughInput.value),
+          P:Number(prefPct.value),
+          PH:Number(prefHyd.value),
+          PY:Number(prefYeastPct.value),
+          W:Number(waterPct.value),
+          S:Number(saltPct.value),
+          Y:Number(yeastPct.value),
+          name
+        };
+        recipes.push(newRecipe);
+        localStorage.setItem("recipes",JSON.stringify(recipes));
+        refreshDropdown();
+        recipeNameInput.value="";
+      });
 
-    <p>🌾 Totalt mjöl: <strong><span id="totalFlour">0</span> g</strong></p>
-    <p>💧 Totalt vatten: <strong><span id="totalWater">0</span> g</strong></p>
-    <p>⚖️ Total deg: <strong><span id="totalCheck">0</span> g</strong></p>
-  </section>
+      deleteRecipeBtn.addEventListener("click",()=> {
+        const idx = recipeSelect.value;
+        if(idx===""){ alert("Välj ett recept att radera."); return;}
+        const name = recipes[idx].name;
+        if(!confirm(`Radera receptet "${name}"?`)) return;
+        recipes.splice(idx,1);
+        localStorage.setItem("recipes",JSON.stringify(recipes));
+        refreshDropdown();
+        recipeSelect.value="";
+      });
+
+      function refreshDropdown(){
+        recipeSelect.innerHTML=`<option value="">– Välj sparat recept –</option>`;
+        recipes.forEach((r,i)=> {
+          const option=document.createElement("option");
+          option.value=i;
+          option.textContent=r.name;
+          recipeSelect.appendChild(option);
+        });
+      }
+
+      recipeSelect.addEventListener("change",()=> {
+        const idx = recipeSelect.value;
+        if(idx==="")return;
+        const r = recipes[idx];
+        totalDoughInput.value=r.D;
+        prefPct.value=r.P;
+        prefHyd.value=r.PH;
+        prefYeastPct.value=r.PY;
+        waterPct.value=r.W;
+        saltPct.value=r.S;
+        yeastPct.value=r.Y;
+        recalc();
+      });
+
+      exportBtn.addEventListener("click",()=> {
+        if(!recipes.length)return alert("Inga recept att exportera!");
+        const blob=new Blob([JSON.stringify(recipes,null,2)],{type:"application/json"});
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url; a.download="recept.json"; a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      importBtn.addEventListener("click",()=> importInput.click());
+
+      importInput.addEventListener("change",e=>{
+        const file = e.target.files[0];
+        if(!file)return;
+        const reader=new FileReader();
+        reader.onload=()=> {
+          try{
+            const imported = JSON.parse(reader.result);
+            if(!Array.isArray(imported)) throw new Error("Felaktig fil! Måste vara en array av recept.");
+            recipes = imported;
+            localStorage.setItem("recipes",JSON.stringify(recipes));
+            refreshDropdown();
+            alert("Recept importerade!");
+          }catch(err){ alert("Kunde inte importera fil: "+err.message); }
+        };
+        reader.readAsText(file);
+      });
+
+      // --- Recalc ---
+      function recalc(){
+        const D = Number(totalDoughInput.value); if(!D || D<=0)return;
+        const P = Number(prefPct.value)/100;
+        const PH = Number(prefHyd.value)/100;
+        const PY = Number(prefYeastPct.value)/100;
+        const W = Number(waterPct.value)/100;
+        const S = Number(saltPct.value)/100;
+        const Y = Number(yeastPct.value)/100;
+
+        const totalFlour = D/(1+W+S+Y);
+        const totalWater = totalFlour*W;
+        const salt = totalFlour*S;
+        const totalYeast = totalFlour*Y;
+
+        const prefFlour = totalFlour*P;
+        const prefWater = Math.min(prefFlour*PH,totalWater);
+        const prefYeast = prefFlour*PY;
+        const prefTotal = prefFlour+prefWater+prefYeast;
+
+        const mainFlour = totalFlour-prefFlour;
+        const mainWater = Math.max(totalWater-prefWater,0);
+        const mainYeast = totalYeast-prefYeast;
+        const mainTotal = mainFlour+mainWater+mainYeast+salt;
+
+        prefFlourEl.textContent = Math.round(prefFlour);
+        prefWaterEl.textContent = Math.round(prefWater);
+        prefYeastEl.textContent = prefYeast.toFixed(1);
+        prefTotalEl.textContent = Math.round(prefTotal);
+
+        mainFlourEl.textContent = Math.round(mainFlour);
+        mainWaterEl.textContent = Math.round(mainWater);
+        saltEl.textContent = salt.toFixed(1);
+        yeastEl.textContent = mainYeast.toFixed(1);
+        mainTotalEl.textContent = Math.round(mainTotal);
+
+        totalFlourEl.textContent = Math.round(totalFlour);
+        totalWaterEl.textContent = Math.round(totalWater);
+        totalCheckEl.textContent = Math.round(prefTotal+mainTotal);
+      }
+
+      // --- Persist inputs ---
+      inputs.forEach(input=>{
+        const saved = localStorage.getItem(input.id);
+        if(saved!==null) input.value=saved;
+        input.addEventListener("input",()=> { localStorage.setItem(input.id,input.value); recalc(); });
+      });
+
+      recalc();
+    });
+  </script>
+</body>
+</html>
+
 
 </div>
 
