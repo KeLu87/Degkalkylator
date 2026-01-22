@@ -147,6 +147,12 @@
         <input type="file" id="importRecipesInput" accept=".json" style="display:none;">
         <button id="importRecipesBtn" class="settings-btn">📥 Importera recept</button>
       </div>
+
+      <!-- Återställ data -->
+      <hr>
+      <button id="resetAppBtn" class="settings-btn danger">
+        ↺ Återställ alla värden
+      </button>
     </div>
 
     <!-- Dynamiskt verktygsfält -->
@@ -387,6 +393,14 @@
         };
         reader.readAsText(file);
       });
+
+      // --- Återställ data ---
+      function hardResetApp() {
+        const ok = confirm("Återställ appen helt till grundläge?");
+        if (!ok) return;
+          localStorage.clear();
+          location.reload();
+      }
 
       // --- Recalc ---
       function recalc(){
