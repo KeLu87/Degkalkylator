@@ -81,8 +81,23 @@
     /* =============================
        Reset-knapp i settings
     ============================ */
-    #settingsPanel .reset-icon { display: block; margin: 16px auto; background: none; border: none; font-size: 26px; cursor: pointer; color: #ff3b30; transition: transform 0.15s ease, opacity 0.15s ease; text-align: center; }
-    
+    /* #settingsPanel .reset-icon { display: block; margin: 16px auto; background: none; border: none; font-size: 26px; cursor: pointer; color: #ff3b30; transition: transform 0.15s ease, opacity 0.15s ease; text-align: center; } */
+    /* Reset-knapp i settings, centrerad och röd */
+    #settingsPanel .reset-icon {
+    display: block;           /* block gör margin:auto möjligt */
+    margin: 16px auto;        /* centrerar horisontellt */
+    background: none !important;
+    border: none !important;
+    font-size: 26px;
+    cursor: pointer;
+    color: #ff3b30 !important;  /* tvingar iOS-röd */
+    text-align: center;
+    transition: transform 0.15s ease, opacity 0.15s ease;  
+    settingsPanel .reset-icon:hover {
+    transform: rotate(-20deg) scale(1.1);
+    opacity: 0.85;
+    }
+
     /* =============================
        Light mode
     ============================ */
