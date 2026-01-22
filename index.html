@@ -395,13 +395,15 @@
       });
 
       // --- Återställ data ---
+      const resetAppBtn = document.getElementById("resetAppBtn");
       function hardResetApp() {
         const ok = confirm("Återställ appen helt till grundläge?");
         if (!ok) return;
           localStorage.clear();
           location.reload();
       }
-
+      resetAppBtn.addEventListener("click", hardResetApp);
+      
       // --- Recalc ---
       function recalc(){
         const D = Number(totalDoughInput.value); if(!D || D<=0)return;
