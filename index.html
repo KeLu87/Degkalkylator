@@ -156,7 +156,7 @@
         <button id="saveRecipeBtn" class="settings-btn">💾 Spara recept</button>
         <button id="deleteRecipeBtn" class="settings-btn">🗑 Radera recept</button>
         <label id="recipeSelectWrapper">📂 Välj recept
-          <select id="recipeSelect"><option value="">– Inget recept... –</option></select>
+          <select id="recipeSelect"><option value="">– Inget recept –</option></select>
         </label>
         <hr>
         <button id="exportRecipesBtn" class="settings-btn">📤 Exportera recept</button>
@@ -171,8 +171,15 @@
       </button>
     </div>
 
-    <!-- Dynamiskt verktygsfält -->
-    <div id="recipeInsertPoint"></div>
+    <!-- Välj recept -->
+    <section id="recipeSelectorSection">
+      <label id="recipeSelectWrapper">
+        📂 Välj recept
+        <select id="recipeSelect">
+          <option value="">– Inget recept –</option>
+        </select>
+      </label>
+    </section>
 
     <!-- Inputs -->
     <section class="base-inputs">
@@ -257,14 +264,12 @@
       const prefSection = document.getElementById("prefSection");
 
       const recipeToggle = document.getElementById("recipeToggle");
-      const recipeSection = document.getElementById("recipeSection");
+      const recipeSelect = document.getElementById("recipeSelect");
       const recipeSelectWrapper = document.getElementById("recipeSelectWrapper");
-      const recipeInsertPoint = document.getElementById("recipeInsertPoint");
 
       const recipeNameInput = document.getElementById("recipeNameInput");
       const saveRecipeBtn = document.getElementById("saveRecipeBtn");
       const deleteRecipeBtn = document.getElementById("deleteRecipeBtn");
-      const recipeSelect = document.getElementById("recipeSelect");
       const exportBtn = document.getElementById("exportRecipesBtn");
       const importBtn = document.getElementById("importRecipesBtn");
       const importInput = document.getElementById("importRecipesInput");
@@ -306,22 +311,11 @@
           recalc();
         });
       })();
-
+      
       // --- Recipe toggle ---
-      const recipeOriginalParent = recipeSelectWrapper.parentNode;
-      const recipeOriginalNext = recipeSelectWrapper.nextSibling;
-      moveRecipeSelector(recipeToggle.checked);
-      recipeToggle.checked=false;
-      recipeSection.classList.add("collapsed");
-      recipeToggle.addEventListener("change",()=> {
-        const en = recipeToggle.checked;
-        recipeSection.classList.toggle("collapsed",!en);
-        moveRecipeSelector(en);
+      recipeToggle.addEventListener("change", () => {
+        recipeSection.classList.toggle("collapsed", !recipeToggle.checked);
       });
-      function moveRecipeSelector(enabled){
-        if(enabled) recipeInsertPoint.appendChild(recipeSelectWrapper);
-        else recipeOriginalParent.insertBefore(recipeSelectWrapper,recipeOriginalNext);
-      }
 
       // --- Recipes ---
       let recipes = JSON.parse(localStorage.getItem("recipes")||"[]");
@@ -359,7 +353,7 @@
       });
 
       function refreshDropdown(){
-        recipeSelect.innerHTML=`<option value="">– Inget recept... –</option>`;
+        recipeSelect.innerHTML=`<option value="">– Inget recept –</option>`;
         recipes.forEach((r,i)=> {
           const option=document.createElement("option");
           option.value=i;
