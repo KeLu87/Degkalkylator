@@ -287,7 +287,9 @@
 
         function applyTheme(theme){
           document.body.classList.remove("dark","light");
+          document.documentElement.classList.remove("dark","light");
           document.body.classList.add(theme);
+          document.documentElement.classList.add(theme);
           themeIcon.textContent = theme==="light"?"☀️":"🌙";
         }
       })();
