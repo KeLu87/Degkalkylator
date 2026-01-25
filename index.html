@@ -69,6 +69,7 @@
     ============================ */
     #flourMixSection { overflow: hidden; max-height: 2000px; opacity: 1; transition: max-height 0.35s ease, opacity 0.25s ease; }
     #flourMixSection.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+    #flourMixSection p { margin-bottom: 0; }
 
     /* =============================
        Settings
@@ -220,7 +221,7 @@
       <label>Jäst (%)</label>
       <input type="number" id="yeastPct" value="1.0">
 	  <section id="flourMixSection" class="collapsed">
-        <label>Mjölmix (%)</label>
+        <label>Mjölmix - delmängd av mjöl (%)</label>
         <input type="number" id="flourMixPct" value="0" min="0" max="50">
 		<p>🌾 Mjölmix: <strong id="flourMix"></strong> g</p>
 	  </section>
@@ -241,40 +242,36 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded",()=> {
       
       // --- App PIN-skydd ---
-(() => {
-  const APP_PIN = "1234";
-
-  // redan godkänd?
-  if (localStorage.getItem("appAuthorized") === "1") return;
-
-  const pin = prompt("🔒 Ange PIN-kod");
-
-  if (pin !== APP_PIN) {
-    document.body.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
-        font-family:-apple-system,system-ui,sans-serif;
-        background:#0f0f12;
-        color:#fff;
-        text-align:center;
-      ">
-        <div>
-          <h2>⛔ Åtkomst nekad</h2>
-          <p>Fel PIN-kod</p>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  localStorage.setItem("appAuthorized", "1");
-})();
+      (() => {
+        const APP_PIN = "1234";
+        // redan godkänd?
+        if (localStorage.getItem("appAuthorized") === "1") return;
+        const pin = prompt("🔒 Ange PIN-kod");
+        if (pin !== APP_PIN) {
+          document.body.innerHTML = `
+            <div style="
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              height:100vh;
+              font-family:-apple-system,system-ui,sans-serif;
+              background:#0f0f12;
+              color:#fff;
+              text-align:center;
+            ">
+              <div>
+                <h2>⛔ Åtkomst nekad, du är inte värdig</h2>
+                <p>Fel PIN-kod</p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        localStorage.setItem("appAuthorized", "1");
+      })();
 
       // --- Elements ---
       const totalDoughInput = document.getElementById("totalDoughInput");
@@ -312,9 +309,7 @@
 	  
 	  const useFlourMix = document.getElementById("useFlourMix");
       const flourMixSection = document.getElementById("flourMixSection");
-      //const flourMixPct = document.getElementById("flourMixPct");
       const flourMixEl  = document.getElementById("flourMix");
-	  //const baseFlourEl = document.getElementById("baseFlour");
 
       const recipeToggle = document.getElementById("recipeToggle");
       const recipeSelect = document.getElementById("recipeSelect");
@@ -327,7 +322,7 @@
       const importInput = document.getElementById("importRecipesInput");
 
       // --- Settings toggle ---
-      settingsBtn.addEventListener("click", () => settingsPanel.classList.toggle("open"));
+      settingsBtn.addEventListener("click",()=> settingsPanel.classList.toggle("open"));
 
       // --- Theme ---
       (() => {
@@ -335,7 +330,7 @@
         applyTheme(savedTheme);
         themeToggle.checked = savedTheme === "light";
 
-        themeToggle.addEventListener("change", () => {
+        themeToggle.addEventListener("change",()=> {
           const theme = themeToggle.checked ? "light":"dark";
           applyTheme(theme);
           localStorage.setItem("theme", theme);
@@ -346,17 +341,16 @@
           document.documentElement.classList.remove("dark","light");
           document.body.classList.add(theme);
           document.documentElement.classList.add(theme);
-          themeIcon.textContent = theme==="light"?"☀️":"🌙";
+          themeIcon.textContent = theme === "light"?"☀️":"🌙";
         }
       })();
 
       // --- Pref toggle ---
       (() => {
-        const savedPref = localStorage.getItem("usePref")==="1";
+        const savedPref = localStorage.getItem("usePref") === "1";
         usePref.checked = savedPref;
         prefSection.classList.toggle("collapsed",!savedPref);
         if(!savedPref) prefPct.value=0;
-
         usePref.addEventListener("change",()=> {
           const on = usePref.checked;
           prefSection.classList.toggle("collapsed",!on);
@@ -372,8 +366,7 @@
         useFlourMix.checked = saved;
         flourMixSection.classList.toggle("collapsed", !saved);
         if (!saved) flourMixPct.value = 0;
-
-        useFlourMix.addEventListener("change", () => {
+        useFlourMix.addEventListener("change",()=> {
           const on = useFlourMix.checked;
           flourMixSection.classList.toggle("collapsed", !on);
           if (!on) flourMixPct.value = 0;
@@ -383,7 +376,7 @@
       })();
       
       // --- Recipe toggle ---
-      recipeToggle.addEventListener("change", () => {
+      recipeToggle.addEventListener("change",()=> {
         recipeSection.classList.toggle("collapsed", !recipeToggle.checked);
       });
 
@@ -414,7 +407,7 @@
 
       deleteRecipeBtn.addEventListener("click",()=> {
         const idx = recipeSelect.value;
-        if(idx===""){ alert("Välj ett recept att radera."); return;}
+        if(idx === ""){ alert("Välj ett recept att radera."); return;}
         const name = recipes[idx].name;
         if(!confirm(`Radera receptet "${name}"?`)) return;
         recipes.splice(idx,1);
@@ -425,13 +418,13 @@
 
       function applyDefaults() {
         totalDoughInput.value = 1000;
-        prefPct.value = 0;
-        prefHyd.value = 60;
-        prefYeastPct.value = 0.1;
-		flourMixPct.value = 0;
-        waterPct.value = 65;
-        saltPct.value = 2.5;
-        yeastPct.value = 1.0;
+        prefPct.value         = 0;
+        prefHyd.value         = 60;
+        prefYeastPct.value    = 0.1;
+	    flourMixPct.value     = 0;
+        waterPct.value        = 65;
+        saltPct.value         = 2.5;
+        yeastPct.value        = 1.0;
         recalc();
       }
 
@@ -445,14 +438,14 @@
         });
       }
 
-      recipeSelect.addEventListener("change",() => {
+      recipeSelect.addEventListener("change",()=> {
         const idx = recipeSelect.value;
         if (idx === "") {
           applyDefaults();
 		  // Reset fördeg
           usePref.checked = false;
           usePref.dispatchEvent(new Event("change"));
-		  // Reset mjölmix
+	      // Reset mjölmix
           useFlourMix.checked = false;
           useFlourMix.dispatchEvent(new Event("change"));
           return;
@@ -463,17 +456,20 @@
         prefPct.value         = r.P;
         prefHyd.value         = r.PH;
         prefYeastPct.value    = r.PY;
+		flourMixPct.value     = r.FM;
         waterPct.value        = r.W;
         saltPct.value         = r.S;
         yeastPct.value        = r.Y;
-        // Fördeg om recept har data
-        const hasPref = Number(r.P) > 0;
+        // Fördeg från recept  
+        prefPct.value = Number(r.P) || 0;
+        const hasPref = prefPct.value > 0;
         usePref.checked = hasPref;
         usePref.dispatchEvent(new Event("change"));
-		// Mjölmix om recept har data
-		const hasMix = Number(r.FM) > 0;
-		useFlourMix.checked = hasMix;
-		useFlourMix.dispatchEvent(new Event("change"));
+        // Mjölmix från recept
+        flourMixPct.value = Number(r.FM) || 0;
+        const hasMix = flourMixPct.value > 0;
+        useFlourMix.checked = hasMix;
+        useFlourMix.dispatchEvent(new Event("change"));
         recalc();
       });
 
@@ -517,14 +513,14 @@
       
       // --- Recalc ---
       function recalc(){
-        const D = Number(totalDoughInput.value); if(!D || D<=0)return;
-        const P = Number(prefPct.value)/100;
+        const D  = Number(totalDoughInput.value); if(!D || D<=0)return;
+        const P  = Number(prefPct.value)/100;
         const PH = Number(prefHyd.value)/100;
         const PY = Number(prefYeastPct.value)/100;
-        const W = Number(waterPct.value)/100;
-        const S = Number(saltPct.value)/100;
-        const Y = Number(yeastPct.value)/100;
-		const FM = Number(flourMixPct.value)/100;
+        const FM = Number(flourMixPct.value)/100;
+        const W  = Number(waterPct.value)/100;
+        const S  = Number(saltPct.value)/100;
+        const Y  = Number(yeastPct.value)/100;
 
         const totalFlour = D/(1+W+S+Y);
         const totalWater = totalFlour*W;
@@ -541,22 +537,19 @@
         const mainYeast = totalYeast-prefYeast;
         const mainTotal = mainFlour+mainWater+mainYeast+salt;
         
-        // const FM = Number(flourMixPct.value || 0) /100;
         const flourMix  = mainFlour * FM;
-        //const baseFlour = mainFlour - flourMix;
 
         prefFlourEl.textContent = Math.round(prefFlour);
         prefWaterEl.textContent = Math.round(prefWater);
         prefYeastEl.textContent = prefYeast.toFixed(1);
         prefTotalEl.textContent = Math.round(prefTotal);
 
-        mainFlourEl.textContent = Math.round(mainFlour);
+        mainFlourEl.textContent = Math.round(mainFlour - flourMix);
         mainWaterEl.textContent = Math.round(mainWater);
         saltEl.textContent = salt.toFixed(1);
         yeastEl.textContent = mainYeast.toFixed(1);
         mainTotalEl.textContent = Math.round(mainTotal);
         
-        //baseFlourEl.textContent = Math.round(baseFlour);
         flourMixEl.textContent  = Math.round(flourMix);
 
         totalFlourEl.textContent = Math.round(totalFlour);
@@ -568,8 +561,9 @@
       inputs.forEach(input=>{
         const saved = localStorage.getItem(input.id);
         if(saved!==null) input.value=saved;
-        input.addEventListener("input",()=> { localStorage.setItem(input.id,input.value);
-		recalc();
+        input.addEventListener("input",()=> { 
+		  localStorage.setItem(input.id,input.value);
+		  recalc();
 		});
       });
 
