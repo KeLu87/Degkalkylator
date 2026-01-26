@@ -527,7 +527,7 @@
       // --- Återställ data ---
       const resetAppBtn = document.getElementById("resetAppBtn");
       function hardResetApp() {
-        const ok = confirm("Återställ appen helt till grundläge?\nDet kommer radera lokal data, recept etc.");
+        const ok = confirm("Återställ appen helt till grundläge?\nAll lokal data raderas, recept etc.");
         if (!ok) return;
           localStorage.clear();
           location.reload();
