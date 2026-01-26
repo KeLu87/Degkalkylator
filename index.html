@@ -53,7 +53,7 @@
     ============================ */
     .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .toggle-row input { display: none; }
-    .switch { width: 46px; height: 26px; background: #3a3a3c; border-radius: 13px; position: relative; cursor: pointer; }
+    .switch { width: 46px; height: 26px; background: #4a4a4c; border-radius: 13px; position: relative; cursor: pointer; }
     .switch::after { content: ""; width: 22px; height: 22px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.25s ease; }
     .toggle-row input:checked + .switch { background: #34c759; }
     .toggle-row input:checked + .switch::after { transform: translateX(20px); }
@@ -87,10 +87,10 @@
     ============================ */
     .recipe-section { margin-top: 10px; }
     .recipe-section.collapsed { display: none; }
-    #settingsPanel button, #settingsPanel select { width: 48%; padding: 8px; font-size: 16px; border-radius: 10px; margin-top: 8px; background: #2c2c2e; border: 1px solid #3a3a3c; color: #f2f2f7; -webkit-appearance: none; cursor: pointer; transition: all 0.2s; }
+    #settingsPanel button, #settingsPanel select { width: 48%; padding: 8px; font-size: 16px; border-radius: 10px; margin-top: 8px; background: #3a3a3c; border: 1px solid #3a3a3c; color: #f2f2f7; -webkit-appearance: none; cursor: pointer; transition: all 0.2s; }
     #settingsPanel button:hover, #settingsPanel select:hover { background: #3a3a3c; }
     #recipeSelect { width: 65%; padding: 8px; font-size: 16px; margin-top: 6px; border-radius: 10px; background: #2c2c2e; color:#fff; border:1px solid #3a3a3c; -webkit-appearance:none; appearance:none; transition: all 0.3s; }
-    #recipeNameInput { width: 90%; padding: 8px; font-size: 16px; }
+    #recipeNameInput { width: 90%; padding: 8px; font-size: 16px; background: #3a3a3c; }
 
     /* =============================
        Reset-knapp i settings
@@ -121,12 +121,12 @@
   	body.light .settings-panel h2 { color:#666; }
     body.light .settings-panel h4 { color:#666; }
     body.light #settingsPanel button, body.light #settingsPanel select { background:#f2f2f7; border:1px solid #ccc; color:#000; }
-    body.light #settingsPanel button:hover, body.light #settingsPanel select:hover { background:#e0e0e0; }
+    body.light #settingsPanel button:hover, body.light #settingsPanel select:hover { background:#f9f9f7; }
     body.light .switch { background: #d1d1d6; }
     body.light .toggle-row input:checked + .switch { background: #34c759; }
     body.light .switch::after { background: #ffffff; }
   	body.light #recipeSelect { background:#f2f2f7; color:#000; border:1px solid #ccc; appearance:none; -webkit-appearance:none; }
-    body.light #recipeNameInput { background: #f2f2f7; width: 90%; padding: 8px; font-size: 16px; }
+    body.light #recipeNameInput { background: #f9f9f7; width: 90%; padding: 8px; font-size: 16px; }
 
   </style>
 </head>
